@@ -1,0 +1,37 @@
+---
+driver:
+  name: docker
+
+provisioner:
+  name: chef_zero
+  product_name: chef
+  product_version: 14.12.3
+  accept_license: true
+  always_update_cookbooks: true
+
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: ubuntu-18.04
+    driver_config:
+      forward:
+        - 80:80
+        - 1936:1936
+
+suites:
+  - name: node1
+    driver:
+      vm_hostname: lb01
+      network:
+      - ["private_network", {ip: "192.168.1.70"}]
+      customize:
+        memory: 1024
+        cpus: 1
+    run_list:
+      - recipe[lb::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
